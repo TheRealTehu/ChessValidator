@@ -44,7 +44,7 @@ public class ChessValidator {
 
         countPieces();
 
-        return   hasCorrectNumberOfPawns() && hasOneKingEach()
+        return hasCorrectNumberOfPawns() && hasOneKingEach()
                 && hasCorrectNumberOfPieces() && !kingsAreNextToEachOther();
     }
 
@@ -89,7 +89,6 @@ public class ChessValidator {
                 hasCorrectNumberOfPiece(BLACK_BISHOP, maxNumberOfBlackPieces) &&
                 hasCorrectNumberOfPiece(WHITE_KNIGHT, maxNumberOfWhitePieces) &&
                 hasCorrectNumberOfPiece(BLACK_KNIGHT, maxNumberOfBlackPieces);
-
     }
 
     private boolean hasCorrectNumberOfPiece(char piece, int maxNumberOfPiece) {
@@ -125,7 +124,6 @@ public class ChessValidator {
                 return false;
             }
         }
-
         return true;
     }
 }
