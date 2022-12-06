@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class ChessFileManager {
     public List<char[][]> readFromFile() {
-        String filePath = "src/main/resources/input.txt";
+        String filePath = "src/main/resources/input2.txt";
 
         List<char[][]> boardStates = new ArrayList<>();
 

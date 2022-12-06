@@ -86,9 +86,9 @@ public class ChessValidator {
         int endI = (kingPosition[0] + 1 >= BOARD_SIZE) ? kingPosition[0] : kingPosition[0] + 1;
         int endJ = (kingPosition[1] + 1 >= BOARD_SIZE) ? kingPosition[1] : kingPosition[1] + 1;
 
-        for (int i = startI; i < endI; i++) {
-            for (int j = startJ; j < endJ; j++) {
-                if ((board[i][j] == BLACK_KING || board[i][j] == WHITE_KING) && (i != kingPosition[0] && j != kingPosition[1])) {
+        for (int i = startI; i <= endI; i++) {
+            for (int j = startJ; j <= endJ; j++) {
+                if ((board[i][j] == BLACK_KING || board[i][j] == WHITE_KING) && (i != kingPosition[0] || j != kingPosition[1])) {
                     return true;
                 }
             }
