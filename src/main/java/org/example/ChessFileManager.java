@@ -2,6 +2,8 @@ package org.example;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -38,5 +40,28 @@ public class ChessFileManager {
         }
 
         return boardStates;
+    }
+
+    public void writeToFile(List<char[][]> boards){
+        File file = new File("valid_boards.txt");
+
+        try {
+            file.delete();
+            file.createNewFile();
+            FileWriter fileWriter = new FileWriter(file, true);
+
+            for (char[][] board: boards) {
+                for (int i = 0; i < board.length; i++) {
+                    for (int j = 0; j < board[i].length; j++) {
+                        fileWriter.append(board[i][j]);
+                    }
+                    fileWriter.append(System.lineSeparator());
+                }
+                fileWriter.append("=").append(System.lineSeparator());
+            }
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
