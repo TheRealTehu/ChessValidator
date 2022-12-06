@@ -21,8 +21,7 @@ public class ChessValidator {
 
     private Map<Character, Integer> pieces = new HashMap<>();
 
-    public ChessValidator(char[][] board) {
-        this.board = board;
+    public ChessValidator() {
     }
 
     private void countPieces(){
@@ -37,7 +36,10 @@ public class ChessValidator {
         }
     }
 
-    public boolean isValidState(){
+    public boolean isValidState(char[][] board){
+
+        this.board = board;
+
         if(!isValidBoard() || !noPawnsInIncorrectRows()){
             return false;
         }
