@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static java.util.stream.IntStream.range;
 
 public class ChessValidator {
     public static final int BOARD_SIZE = 8;
@@ -25,16 +26,8 @@ public class ChessValidator {
 
     private void countPieces(char[][] board) {
         pieces = new HashMap<>();
-
         initializeMap();
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (pieces.containsKey(board[i][j])) {
-                    pieces.put(board[i][j], pieces.get(board[i][j]) + 1);
-                }
-            }
-        }
+        getAllBoardLocations().forEach(p -> pieces.computeIfPresent(boardAt(board, p), (ch, i) -> i + 1));
     }
 
     private void initializeMap() {
@@ -121,27 +114,31 @@ public class ChessValidator {
     }
 
     private boolean noPawnsInIncorrectRows(char[][] board) {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            if (board[0][i] == WHITE_PAWN || board[BOARD_SIZE - 1][i] == WHITE_PAWN
-                || board[0][i] == BLACK_PAWN || board[BOARD_SIZE - 1][i] == BLACK_PAWN) {
-                return false;
-            }
-        }
-        return true;
+        boolean pawnInFirstRow = range(0, BOARD_SIZE).mapToObj(i -> board[0][i]).anyMatch(c -> c == WHITE_PAWN || c == BLACK_PAWN);
+        boolean pawnInLastRow = range(0, BOARD_SIZE).mapToObj(i -> board[BOARD_SIZE - 1][i]).anyMatch(c -> c == WHITE_PAWN || c == BLACK_PAWN);
+        return !pawnInFirstRow && !pawnInLastRow;
     }
 
     private boolean hasValidBoardSize(char[][] board) {
-        return board.length == BOARD_SIZE &&
-               Arrays.stream(board)
-                       .allMatch(row -> row.length == BOARD_SIZE);
+        return board.length == BOARD_SIZE && Arrays.stream(board).allMatch(row -> row.length == BOARD_SIZE);
+    }
+
+    private Stream<Position> getAllBoardLocations() {
+        return range(0, BOARD_SIZE)
+                .boxed()
+                .flatMap(row -> range(0, BOARD_SIZE).mapToObj(col -> new Position(row, col)));
+    }
+
+    private char boardAt(char[][] board, Position p) {
+        return board[p.row()][p.column()];
     }
 }
 
 record Position(int row, int column) {
     public Stream<Position> getNeighbours() {
-        return IntStream.range(row - 1, row + 2)
+        return range(row - 1, row + 2)
                 .boxed()
-                .flatMap(r -> IntStream.range(column - 1, column + 2).mapToObj(c -> new Position(r, c)))
+                .flatMap(r -> range(column - 1, column + 2).mapToObj(c -> new Position(r, c)))
                 .filter(p -> !p.equals(this))
                 .filter(Position::isInsideBoard);
     }
