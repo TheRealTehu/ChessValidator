@@ -4,19 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChessValidator {
-    private final int BOARD_SIZE = 8;
-    private final char WHITE_KING = 'k';
-    private final char BLACK_KING = 'K';
-    private final char WHITE_QUEEN = 'v';
-    private final char BLACK_QUEEN = 'V';
-    private final char WHITE_ROOK = 'b';
-    private final char BLACK_ROOK = 'B';
-    private final char WHITE_BISHOP = 'f';
-    private final char BLACK_BISHOP = 'F';
-    private final char WHITE_KNIGHT = 'h';
-    private final char BLACK_KNIGHT = 'H';
-    private final char WHITE_PAWN = 'g';
-    private final char BLACK_PAWN = 'G';
+    private static final int BOARD_SIZE = 8;
+    private static final char WHITE_KING = 'k';
+    private static final char BLACK_KING = 'K';
+    private static final char WHITE_QUEEN = 'v';
+    private static final char BLACK_QUEEN = 'V';
+    private static final char WHITE_ROOK = 'b';
+    private static final char BLACK_ROOK = 'B';
+    private static final char WHITE_BISHOP = 'f';
+    private static final char BLACK_BISHOP = 'F';
+    private static final char WHITE_KNIGHT = 'h';
+    private static final char BLACK_KNIGHT = 'H';
+    private static final char WHITE_PAWN = 'g';
+    private static final char BLACK_PAWN = 'G';
     private Map<Character, Integer> pieces;
 
     public ChessValidator() {
@@ -52,22 +52,11 @@ public class ChessValidator {
     }
 
     public boolean isValidState(char[][] board) {
-
         System.out.println("New board");
-
-        if (!isValidBoard(board) || !noPawnsInIncorrectRows(board)) {
+        if (!hasValidBoardSize(board) || !noPawnsInIncorrectRows(board)) {
             return false;
         }
-
-
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                System.out.print(board[i][j]);
-            }
-            System.out.println();
-        }
-
-
+        printBoard(board);
         countPieces(board);
 
         System.out.println("hasCorrectNumberOfPawns: " + hasCorrectNumberOfPawns());
@@ -77,6 +66,12 @@ public class ChessValidator {
 
         return hasCorrectNumberOfPawns() && hasOneKingEach()
                && hasCorrectNumberOfPieces() && !kingsAreNextToEachOther(board);
+    }
+
+    private static void printBoard(char[][] board) {
+        for (int i = 0; i < board.length; i++) {
+            System.out.println(new String(board[i]));
+        }
     }
 
     private boolean kingsAreNextToEachOther(char[][] board) {
@@ -145,7 +140,7 @@ public class ChessValidator {
         return true;
     }
 
-    private boolean isValidBoard(char[][] board) {
+    private boolean hasValidBoardSize(char[][] board) {
         if (board.length != BOARD_SIZE) {
             return false;
         }
