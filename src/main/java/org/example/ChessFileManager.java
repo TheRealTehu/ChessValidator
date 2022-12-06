@@ -29,11 +29,8 @@ public class ChessFileManager {
                     state = new char[8][8];
                     rowNum = 0;
                 }
-
             }
-
             boardStates.add(state);
-
         } catch (FileNotFoundException e) {
             System.out.println("Error while reading file!");
             return boardStates;
@@ -42,7 +39,7 @@ public class ChessFileManager {
         return boardStates;
     }
 
-    public void writeToFile(List<char[][]> boards){
+    public void writeToFile(List<char[][]> boards) {
         File file = new File("valid_boards.txt");
 
         try {
@@ -50,7 +47,7 @@ public class ChessFileManager {
             file.createNewFile();
             FileWriter fileWriter = new FileWriter(file, true);
 
-            for (char[][] board: boards) {
+            for (char[][] board : boards) {
                 for (int i = 0; i < board.length; i++) {
                     for (int j = 0; j < board[i].length; j++) {
                         fileWriter.append(board[i][j]);

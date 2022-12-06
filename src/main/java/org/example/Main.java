@@ -1,16 +1,12 @@
 package org.example;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello world!");
         ChessFileManager manager = new ChessFileManager();
-
         List<char[][]> boards = manager.readFromFile();
-
 
 //        for (char[][] board: boards) {
 //            for (int i = 0; i < board.length; i++) {
@@ -20,11 +16,8 @@ public class Main {
 //                System.out.println();
 //            }
 //        }
-
         ChessValidator validator = new ChessValidator();
-
         List<char[][]> validBoards = boards.stream().filter(validator::isValidState).toList();
-
         manager.writeToFile(validBoards);
     }
 }

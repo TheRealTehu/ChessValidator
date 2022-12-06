@@ -76,7 +76,7 @@ public class ChessValidator {
         System.out.println("!kingsAreNextToEachOther: " + !kingsAreNextToEachOther(board));
 
         return hasCorrectNumberOfPawns() && hasOneKingEach()
-                && hasCorrectNumberOfPieces() && !kingsAreNextToEachOther(board);
+               && hasCorrectNumberOfPieces() && !kingsAreNextToEachOther(board);
     }
 
     private boolean kingsAreNextToEachOther(char[][] board) {
@@ -113,13 +113,13 @@ public class ChessValidator {
         int maxNumberOfBlackPieces = 10 - pieces.get(BLACK_PAWN);
 
         return hasCorrectNumberOfPiece(WHITE_QUEEN, maxNumberOfWhitePieces - 1) &&
-                hasCorrectNumberOfPiece(BLACK_QUEEN, maxNumberOfBlackPieces - 1) &&
-                hasCorrectNumberOfPiece(WHITE_ROOK, maxNumberOfWhitePieces) &&
-                hasCorrectNumberOfPiece(BLACK_ROOK, maxNumberOfBlackPieces) &&
-                hasCorrectNumberOfPiece(WHITE_BISHOP, maxNumberOfWhitePieces) &&
-                hasCorrectNumberOfPiece(BLACK_BISHOP, maxNumberOfBlackPieces) &&
-                hasCorrectNumberOfPiece(WHITE_KNIGHT, maxNumberOfWhitePieces) &&
-                hasCorrectNumberOfPiece(BLACK_KNIGHT, maxNumberOfBlackPieces);
+               hasCorrectNumberOfPiece(BLACK_QUEEN, maxNumberOfBlackPieces - 1) &&
+               hasCorrectNumberOfPiece(WHITE_ROOK, maxNumberOfWhitePieces) &&
+               hasCorrectNumberOfPiece(BLACK_ROOK, maxNumberOfBlackPieces) &&
+               hasCorrectNumberOfPiece(WHITE_BISHOP, maxNumberOfWhitePieces) &&
+               hasCorrectNumberOfPiece(BLACK_BISHOP, maxNumberOfBlackPieces) &&
+               hasCorrectNumberOfPiece(WHITE_KNIGHT, maxNumberOfWhitePieces) &&
+               hasCorrectNumberOfPiece(BLACK_KNIGHT, maxNumberOfBlackPieces);
     }
 
     private boolean hasCorrectNumberOfPiece(char piece, int maxNumberOfPiece) {
@@ -137,7 +137,7 @@ public class ChessValidator {
     private boolean noPawnsInIncorrectRows(char[][] board) {
         for (int i = 0; i < BOARD_SIZE; i++) {
             if (board[0][i] == WHITE_PAWN || board[BOARD_SIZE - 1][i] == WHITE_PAWN
-                    || board[0][i] == BLACK_PAWN || board[BOARD_SIZE - 1][i] == BLACK_PAWN) {
+                || board[0][i] == BLACK_PAWN || board[BOARD_SIZE - 1][i] == BLACK_PAWN) {
                 return false;
             }
         }
