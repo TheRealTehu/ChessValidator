@@ -69,11 +69,11 @@ public class ChessValidator {
     }
 
     private boolean kingsAreNextToEachOther(char[][] board) {
-        return findAKing(board).map(kingPos -> kingPos.getNeighbours()
-                .anyMatch(pos -> {
-                    char c = board[pos.row()][pos.column()];
-                    return c == BLACK_KING || c == WHITE_KING;
-                })).orElse(false);
+        return findAKing(board).map(
+                kingPos -> kingPos.getNeighbours()
+                        .map(p -> boardAt(board, p))
+                        .anyMatch(c -> c == BLACK_KING || c == WHITE_KING))
+                .orElse(false);
     }
 
     private Optional<Position> findAKing(char[][] board) {
