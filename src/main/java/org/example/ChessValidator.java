@@ -1,10 +1,14 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class ChessValidator {
-    private static final int BOARD_SIZE = 8;
+    public static final int BOARD_SIZE = 8;
     private static final char WHITE_KING = 'k';
     private static final char BLACK_KING = 'K';
     private static final char WHITE_QUEEN = 'v';
@@ -18,9 +22,6 @@ public class ChessValidator {
     private static final char WHITE_PAWN = 'g';
     private static final char BLACK_PAWN = 'G';
     private Map<Character, Integer> pieces;
-
-    public ChessValidator() {
-    }
 
     private void countPieces(char[][] board) {
         pieces = new HashMap<>();
@@ -75,32 +76,22 @@ public class ChessValidator {
     }
 
     private boolean kingsAreNextToEachOther(char[][] board) {
-        int[] kingPosition = findAKing(board);
-        int startI = (kingPosition[0] - 1 < 0) ? kingPosition[0] : kingPosition[0] - 1;
-        int startJ = (kingPosition[1] - 1 < 0) ? kingPosition[1] : kingPosition[1] - 1;
-        int endI = (kingPosition[0] + 1 >= BOARD_SIZE) ? kingPosition[0] : kingPosition[0] + 1;
-        int endJ = (kingPosition[1] + 1 >= BOARD_SIZE) ? kingPosition[1] : kingPosition[1] + 1;
-
-        for (int i = startI; i <= endI; i++) {
-            for (int j = startJ; j <= endJ; j++) {
-                if ((board[i][j] == BLACK_KING || board[i][j] == WHITE_KING) && (i != kingPosition[0] || j != kingPosition[1])) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return findAKing(board).map(kingPos -> kingPos.getNeighbours()
+                .anyMatch(pos -> {
+                    char c = board[pos.row()][pos.column()];
+                    return c == BLACK_KING || c == WHITE_KING;
+                })).orElse(false);
     }
 
-    private int[] findAKing(char[][] board) {
+    private Optional<Position> findAKing(char[][] board) {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (board[i][j] == BLACK_KING || board[i][j] == WHITE_KING) {
-                    return new int[]{i, j};
+                    return Optional.of(new Position(i, j));
                 }
             }
         }
-        return new int[]{-1, -1};
+        return Optional.empty();
     }
 
     private boolean hasCorrectNumberOfPieces() {
@@ -136,20 +127,27 @@ public class ChessValidator {
                 return false;
             }
         }
-
         return true;
     }
 
     private boolean hasValidBoardSize(char[][] board) {
-        if (board.length != BOARD_SIZE) {
-            return false;
-        }
+        return board.length == BOARD_SIZE &&
+               Arrays.stream(board)
+                       .allMatch(row -> row.length == BOARD_SIZE);
+    }
+}
 
-        for (char[] chars : board) {
-            if (chars.length != BOARD_SIZE) {
-                return false;
-            }
-        }
-        return true;
+record Position(int row, int column) {
+    public Stream<Position> getNeighbours() {
+        return IntStream.range(row - 1, row + 2)
+                .boxed()
+                .flatMap(r -> IntStream.range(column - 1, column + 2).mapToObj(c -> new Position(r, c)))
+                .filter(p -> !p.equals(this))
+                .filter(Position::isInsideBoard);
+    }
+
+    private boolean isInsideBoard() {
+        return 0 <= row && row < ChessValidator.BOARD_SIZE &&
+               0 <= column && column < ChessValidator.BOARD_SIZE;
     }
 }
