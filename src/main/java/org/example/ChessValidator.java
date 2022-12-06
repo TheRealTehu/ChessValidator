@@ -69,8 +69,8 @@ public class ChessValidator {
     }
 
     private static void printBoard(char[][] board) {
-        for (int i = 0; i < board.length; i++) {
-            System.out.println(new String(board[i]));
+        for (char[] chars : board) {
+            System.out.println(new String(chars));
         }
     }
 
@@ -145,8 +145,8 @@ public class ChessValidator {
             return false;
         }
 
-        for (int i = 0; i < board.length; i++) {
-            if (board[i].length != BOARD_SIZE) {
+        for (char[] chars : board) {
+            if (chars.length != BOARD_SIZE) {
                 return false;
             }
         }
