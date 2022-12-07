@@ -1,39 +1,33 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static java.util.stream.IntStream.range;
 
 public class ChessValidator {
-    private final int BOARD_SIZE = 8;
-    private final char WHITE_KING = 'k';
-    private final char BLACK_KING = 'K';
-    private final char WHITE_QUEEN = 'v';
-    private final char BLACK_QUEEN = 'V';
-    private final char WHITE_ROOK = 'b';
-    private final char BLACK_ROOK = 'B';
-    private final char WHITE_BISHOP = 'f';
-    private final char BLACK_BISHOP = 'F';
-    private final char WHITE_KNIGHT = 'h';
-    private final char BLACK_KNIGHT = 'H';
-    private final char WHITE_PAWN = 'g';
-    private final char BLACK_PAWN = 'G';
+    public static final int BOARD_SIZE = 8;
+    private static final char WHITE_KING = 'k';
+    private static final char BLACK_KING = 'K';
+    private static final char WHITE_QUEEN = 'v';
+    private static final char BLACK_QUEEN = 'V';
+    private static final char WHITE_ROOK = 'b';
+    private static final char BLACK_ROOK = 'B';
+    private static final char WHITE_BISHOP = 'f';
+    private static final char BLACK_BISHOP = 'F';
+    private static final char WHITE_KNIGHT = 'h';
+    private static final char BLACK_KNIGHT = 'H';
+    private static final char WHITE_PAWN = 'g';
+    private static final char BLACK_PAWN = 'G';
     private Map<Character, Integer> pieces;
-
-    public ChessValidator() {
-    }
 
     private void countPieces(char[][] board) {
         pieces = new HashMap<>();
-
         initializeMap();
-
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (pieces.containsKey(board[i][j])) {
-                    pieces.put(board[i][j], pieces.get(board[i][j]) + 1);
-                }
-            }
-        }
+        getAllBoardLocations().forEach(p -> pieces.computeIfPresent(boardAt(board, p), (ch, i) -> i + 1));
     }
 
     private void initializeMap() {
@@ -52,22 +46,11 @@ public class ChessValidator {
     }
 
     public boolean isValidState(char[][] board) {
-
         System.out.println("New board");
-
-        if (!isValidBoard(board) || !noPawnsInIncorrectRows(board)) {
+        if (!hasValidBoardSize(board) || !noPawnsInIncorrectRows(board)) {
             return false;
         }
-
-
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                System.out.print(board[i][j]);
-            }
-            System.out.println();
-        }
-
-
+        printBoard(board);
         countPieces(board);
 
         System.out.println("hasCorrectNumberOfPawns: " + hasCorrectNumberOfPawns());
@@ -76,36 +59,32 @@ public class ChessValidator {
         System.out.println("!kingsAreNextToEachOther: " + !kingsAreNextToEachOther(board));
 
         return hasCorrectNumberOfPawns() && hasOneKingEach()
-                && hasCorrectNumberOfPieces() && !kingsAreNextToEachOther(board);
+               && hasCorrectNumberOfPieces() && !kingsAreNextToEachOther(board);
+    }
+
+    private static void printBoard(char[][] board) {
+        for (char[] chars : board) {
+            System.out.println(new String(chars));
+        }
     }
 
     private boolean kingsAreNextToEachOther(char[][] board) {
-        int[] kingPosition = findAKing(board);
-        int startI = (kingPosition[0] - 1 < 0) ? kingPosition[0] : kingPosition[0] - 1;
-        int startJ = (kingPosition[1] - 1 < 0) ? kingPosition[1] : kingPosition[1] - 1;
-        int endI = (kingPosition[0] + 1 >= BOARD_SIZE) ? kingPosition[0] : kingPosition[0] + 1;
-        int endJ = (kingPosition[1] + 1 >= BOARD_SIZE) ? kingPosition[1] : kingPosition[1] + 1;
-
-        for (int i = startI; i <= endI; i++) {
-            for (int j = startJ; j <= endJ; j++) {
-                if ((board[i][j] == BLACK_KING || board[i][j] == WHITE_KING) && (i != kingPosition[0] || j != kingPosition[1])) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return findAKing(board).map(
+                kingPos -> kingPos.getNeighbours()
+                        .map(p -> boardAt(board, p))
+                        .anyMatch(c -> c == BLACK_KING || c == WHITE_KING))
+                .orElse(false);
     }
 
-    private int[] findAKing(char[][] board) {
+    private Optional<Position> findAKing(char[][] board) {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (board[i][j] == BLACK_KING || board[i][j] == WHITE_KING) {
-                    return new int[]{i, j};
+                    return Optional.of(new Position(i, j));
                 }
             }
         }
-        return new int[]{-1, -1};
+        return Optional.empty();
     }
 
     private boolean hasCorrectNumberOfPieces() {
@@ -113,13 +92,13 @@ public class ChessValidator {
         int maxNumberOfBlackPieces = 10 - pieces.get(BLACK_PAWN);
 
         return hasCorrectNumberOfPiece(WHITE_QUEEN, maxNumberOfWhitePieces - 1) &&
-                hasCorrectNumberOfPiece(BLACK_QUEEN, maxNumberOfBlackPieces - 1) &&
-                hasCorrectNumberOfPiece(WHITE_ROOK, maxNumberOfWhitePieces) &&
-                hasCorrectNumberOfPiece(BLACK_ROOK, maxNumberOfBlackPieces) &&
-                hasCorrectNumberOfPiece(WHITE_BISHOP, maxNumberOfWhitePieces) &&
-                hasCorrectNumberOfPiece(BLACK_BISHOP, maxNumberOfBlackPieces) &&
-                hasCorrectNumberOfPiece(WHITE_KNIGHT, maxNumberOfWhitePieces) &&
-                hasCorrectNumberOfPiece(BLACK_KNIGHT, maxNumberOfBlackPieces);
+               hasCorrectNumberOfPiece(BLACK_QUEEN, maxNumberOfBlackPieces - 1) &&
+               hasCorrectNumberOfPiece(WHITE_ROOK, maxNumberOfWhitePieces) &&
+               hasCorrectNumberOfPiece(BLACK_ROOK, maxNumberOfBlackPieces) &&
+               hasCorrectNumberOfPiece(WHITE_BISHOP, maxNumberOfWhitePieces) &&
+               hasCorrectNumberOfPiece(BLACK_BISHOP, maxNumberOfBlackPieces) &&
+               hasCorrectNumberOfPiece(WHITE_KNIGHT, maxNumberOfWhitePieces) &&
+               hasCorrectNumberOfPiece(BLACK_KNIGHT, maxNumberOfBlackPieces);
     }
 
     private boolean hasCorrectNumberOfPiece(char piece, int maxNumberOfPiece) {
@@ -135,26 +114,37 @@ public class ChessValidator {
     }
 
     private boolean noPawnsInIncorrectRows(char[][] board) {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            if (board[0][i] == WHITE_PAWN || board[BOARD_SIZE - 1][i] == WHITE_PAWN
-                    || board[0][i] == BLACK_PAWN || board[BOARD_SIZE - 1][i] == BLACK_PAWN) {
-                return false;
-            }
-        }
-
-        return true;
+        boolean pawnInFirstRow = range(0, BOARD_SIZE).mapToObj(i -> board[0][i]).anyMatch(c -> c == WHITE_PAWN || c == BLACK_PAWN);
+        boolean pawnInLastRow = range(0, BOARD_SIZE).mapToObj(i -> board[BOARD_SIZE - 1][i]).anyMatch(c -> c == WHITE_PAWN || c == BLACK_PAWN);
+        return !pawnInFirstRow && !pawnInLastRow;
     }
 
-    private boolean isValidBoard(char[][] board) {
-        if (board.length != BOARD_SIZE) {
-            return false;
-        }
+    private boolean hasValidBoardSize(char[][] board) {
+        return board.length == BOARD_SIZE && Arrays.stream(board).allMatch(row -> row.length == BOARD_SIZE);
+    }
 
-        for (int i = 0; i < board.length; i++) {
-            if (board[i].length != BOARD_SIZE) {
-                return false;
-            }
-        }
-        return true;
+    private Stream<Position> getAllBoardLocations() {
+        return range(0, BOARD_SIZE)
+                .boxed()
+                .flatMap(row -> range(0, BOARD_SIZE).mapToObj(col -> new Position(row, col)));
+    }
+
+    private char boardAt(char[][] board, Position p) {
+        return board[p.row()][p.column()];
+    }
+}
+
+record Position(int row, int column) {
+    public Stream<Position> getNeighbours() {
+        return range(row - 1, row + 2)
+                .boxed()
+                .flatMap(r -> range(column - 1, column + 2).mapToObj(c -> new Position(r, c)))
+                .filter(p -> !p.equals(this))
+                .filter(Position::isInsideBoard);
+    }
+
+    private boolean isInsideBoard() {
+        return 0 <= row && row < ChessValidator.BOARD_SIZE &&
+               0 <= column && column < ChessValidator.BOARD_SIZE;
     }
 }
